@@ -5,81 +5,375 @@ require_once 'botapi.php';
 global $connect;
 //-----------------------------------------------------------------
 try {
-
     $tableName = 'user';
-    $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_name = :tableName");
+    // Check if table exists
+    $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :tableName");
     $stmt->bindParam(':tableName', $tableName);
     $stmt->execute();
-    $tableExists = $stmt->fetch(PDO::FETCH_ASSOC);
+    $tableExists = $stmt->fetch(PDO::FETCH_ASSOC) !== false;
+
     if (!$tableExists) {
-        $stmt = $pdo->prepare("CREATE TABLE $tableName (
-            id VARCHAR(500) PRIMARY KEY,
-            limit_usertest INT(100) NOT NULL,
-            roll_Status BOOL NOT NULL,
-            username VARCHAR(500) NOT NULL,
+        $stmt = $pdo->prepare("CREATE TABLE `$tableName` (
+            id VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            limit_usertest INT NOT NULL DEFAULT 0,
+            roll_Status TINYINT(1) NOT NULL DEFAULT 0,
+            username VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
             Processing_value TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
             Processing_value_one TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
             Processing_value_tow TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
             Processing_value_four TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-            step VARCHAR(500) NOT NULL,
-            description_blocking TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-            number VARCHAR(300) NOT NULL,
-            Balance INT(255) NOT NULL,
-            User_Status VARCHAR(500) NOT NULL,
-            pagenumber INT(10) NOT NULL,
-            message_count VARCHAR(100) NOT NULL,
-            last_message_time VARCHAR(100) NOT NULL,
-            agent VARCHAR(100) NOT NULL,
-            affiliatescount VARCHAR(100) NOT NULL,
-            affiliates VARCHAR(100) NOT NULL,
-            namecustom VARCHAR(300) NOT NULL,
-            number_username VARCHAR(300) NOT NULL,
-            register VARCHAR(100) NOT NULL,
-            verify VARCHAR(100) NOT NULL,
-            cardpayment VARCHAR(100) NOT NULL,
-            codeInvitation VARCHAR(100) NULL,
-            pricediscount VARCHAR(100) NULL   DEFAULT '0',
-            maxbuyagent VARCHAR(100) NULL   DEFAULT '0',
-            joinchannel VARCHAR(100) NULL   DEFAULT '0',
-            checkstatus VARCHAR(50) NULL   DEFAULT '0',
-            bottype TEXT NULL ,
-            score INT(255) NULL DEFAULT '0',
-            limitchangeloc VARCHAR(50) NULL   DEFAULT '0',
-            status_cron VARCHAR(20)  NULL DEFAULT '1',
-            expire VARCHAR(100) NULL ,
-            token VARCHAR(100) NULL 
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci");
+            step VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            description_blocking TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            number VARCHAR(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            Balance INT NOT NULL DEFAULT 0,
+            User_Status VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            pagenumber INT NOT NULL DEFAULT 0,
+            message_count VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            last_message_time VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            agent VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            affiliatescount VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            affiliates VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            namecustom VARCHAR(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            number_username VARCHAR(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            register VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            verify VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            cardpayment VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            codeInvitation VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            pricediscount VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '0',
+            maxbuyagent VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '0',
+            joinchannel VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '0',
+            checkstatus VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '0',
+            bottype TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            score INT NOT NULL DEFAULT 0,
+            limitchangeloc VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '0',
+            status_cron VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '1',
+            expire VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            token VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            PRIMARY KEY (id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
         $stmt->execute();
+
+        // Optional: Insert initial data (uncomment if needed)
+        /*
+        $stmt = $pdo->prepare("INSERT INTO `$tableName` (
+            id, limit_usertest, roll_Status, username, Processing_value, Processing_value_one, 
+            Processing_value_tow, Processing_value_four, step, description_blocking, number, 
+            Balance, User_Status, pagenumber, message_count, last_message_time, agent, 
+            affiliatescount, affiliates, namecustom, number_username, register, verify, 
+            cardpayment, codeInvitation, pricediscount, maxbuyagent, joinchannel, checkstatus, 
+            bottype, score, limitchangeloc, status_cron, expire, token
+        ) VALUES (
+            :id, :limit_usertest, :roll_Status, :username, :Processing_value, :Processing_value_one, 
+            :Processing_value_tow, :Processing_value_four, :step, :description_blocking, :number, 
+            :Balance, :User_Status, :pagenumber, :message_count, :last_message_time, :agent, 
+            :affiliatescount, :affiliates, :namecustom, :number_username, :register, :verify, 
+            :cardpayment, :codeInvitation, :pricediscount, :maxbuyagent, :joinchannel, :checkstatus, 
+            :bottype, :score, :limitchangeloc, :status_cron, :expire, :token
+        )");
+        $stmt->execute([
+            ':id' => '0123456789',
+            ':limit_usertest' => 0,
+            ':roll_Status' => 0,
+            ':username' => 'test',
+            ':Processing_value' => 'none',
+            ':Processing_value_one' => '',
+            ':Processing_value_tow' => '',
+            ':Processing_value_four' => '',
+            ':step' => 'none',
+            ':description_blocking' => null,
+            ':number' => 'none',
+            ':Balance' => 0,
+            ':User_Status' => 'active',
+            ':pagenumber' => 0,
+            ':message_count' => '0',
+            ':last_message_time' => '0',
+            ':agent' => 'none',
+            ':affiliatescount' => '0',
+            ':affiliates' => '0',
+            ':namecustom' => 'none',
+            ':number_username' => '100',
+            ':register' => 'none',
+            ':verify' => '1',
+            ':cardpayment' => '1',
+            ':codeInvitation' => null,
+            ':pricediscount' => '0',
+            ':maxbuyagent' => '0',
+            ':joinchannel' => '0',
+            ':checkstatus' => '0',
+            ':bottype' => null,
+            ':score' => 0,
+            ':limitchangeloc' => '0',
+            ':status_cron' => '1',
+            ':expire' => null,
+            ':token' => null
+        ]);
+        */
+        echo "Table $tableName created successfully.\n";
     } else {
-        addFieldToTable($tableName, 'token', null, "VARCHAR(100)");
-        addFieldToTable($tableName, 'status_cron', "1", "VARCHAR(20)");
-        addFieldToTable($tableName, 'expire', NULL, "VARCHAR(100)");
-        addFieldToTable($tableName, 'limitchangeloc', '0', "VARCHAR(50)");
-        addFieldToTable($tableName, 'bottype', '0', "TEXT");
-        addFieldToTable($tableName, 'score', '0', "INT(255)");
-        addFieldToTable($tableName, 'checkstatus', '0', "VARCHAR(50)");
-        addFieldToTable($tableName, 'joinchannel', '0', "VARCHAR(100)");
-        addFieldToTable($tableName, 'maxbuyagent', '0');
-        addFieldToTable($tableName, 'agent', 'f');
-        addFieldToTable($tableName, 'verify', '1');
-        addFieldToTable($tableName, 'register', 'none');
-        addFieldToTable($tableName, 'namecustom', 'none');
-        addFieldToTable($tableName, 'number_username', '100');
-        addFieldToTable($tableName, 'cardpayment', '1');
-        addFieldToTable($tableName, 'affiliatescount', '0');
-        addFieldToTable($tableName, 'affiliates', '0');
-        addFieldToTable($tableName, 'message_count', '0');
-        addFieldToTable($tableName, 'last_message_time', '0');
-        addFieldToTable($tableName, 'Processing_value_four', '');
-        addFieldToTable($tableName, 'username', 'none');
-        addFieldToTable($tableName, 'Processing_value', 'none');
-        addFieldToTable($tableName, 'number', 'none');
-        addFieldToTable($tableName, 'pagenumber', '');
-        addFieldToTable($tableName, 'codeInvitation', null);
-        addFieldToTable($tableName, 'pricediscount', "0");
+        // Add missing columns with proper types
+        addFieldToTable($tableName, 'id', null, 'VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'limit_usertest', '0', 'INT');
+        addFieldToTable($tableName, 'roll_Status', '0', 'TINYINT(1)');
+        addFieldToTable($tableName, 'username', 'none', 'VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Processing_value', 'none', 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Processing_value_one', '', 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Processing_value_tow', '', 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Processing_value_four', '', 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'step', 'none', 'VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'description_blocking', null, 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'number', 'none', 'VARCHAR(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Balance', '0', 'INT');
+        addFieldToTable($tableName, 'User_Status', 'active', 'VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'pagenumber', '0', 'INT');
+        addFieldToTable($tableName, 'message_count', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'last_message_time', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'agent', 'none', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'affiliatescount', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'affiliates', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'namecustom', 'none', 'VARCHAR(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'number_username', '100', 'VARCHAR(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'register', 'none', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'verify', '1', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'cardpayment', '1', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'codeInvitation', null, 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'pricediscount', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'maxbuyagent', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'joinchannel', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'checkstatus', '0', 'VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'bottype', null, 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'score', '0', 'INT');
+        addFieldToTable($tableName, 'limitchangeloc', '0', 'VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'status_cron', '1', 'VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'expire', null, 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'token', null, 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        echo "Table $tableName already exists, checked and updated columns.\n";
     }
 } catch (PDOException $e) {
-    file_put_contents('error_log user', $e->getMessage());
+    $errorMessage = "Error creating table $tableName: " . $e->getMessage();
+    file_put_contents('error_log_user', $errorMessage . "\n", FILE_APPEND);
+    echo $errorMessage . "\n";
+}
+
+
+
+try {
+    $tableName = 'setting';
+    // Check if table exists
+    $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :tableName");
+    $stmt->bindParam(':tableName', $tableName);
+    $stmt->execute();
+    $tableExists = $stmt->fetch(PDO::FETCH_ASSOC) !== false;
+
+    // Define JSON data
+    $DATAAWARD = json_encode(['one' => '0', 'tow' => '0', 'theree' => '0']);
+    $limitlist = json_encode(['free' => 100, 'all' => 100]);
+    $status_cron = json_encode([
+        'day' => true,
+        'volume' => true,
+        'remove' => false,
+        'remove_volume' => false,
+        'test' => false,
+        'on_hold' => false,
+        'uptime_node' => false,
+        'uptime_panel' => false,
+    ]);
+    $keyboardmain = '{"keyboard":[[{"text":"text_sell"},{"text":"text_extend"}],[{"text":"text_usertest"},{"text":"text_wheel_luck"}],[{"text":"text_Purchased_services"},{"text":"accountwallet"}],[{"text":"text_affiliates"},{"text":"text_Tariff_list"}],[{"text":"text_support"},{"text":"text_help"}]]}';
+
+    if (!$tableExists) {
+        $stmt = $pdo->prepare("CREATE TABLE `$tableName` (
+            id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            Bot_Status VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            roll_Status VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            get_number VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            iran_number VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            NotUser VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            Channel_Report VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            limit_usertest_all VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            affiliatesstatus VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            affiliatespercentage VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            removedayc VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            showcard VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            numbercount VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statusnewuser VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statusagentrequest VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statuscategory VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statusterffh VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            volumewarn VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            inlinebtnmain VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            verifystart VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            id_support VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statusnamecustom VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statuscategorygenral VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statussupportpv VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            agentreqprice VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            bulkbuy VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            on_hold_day VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            cronvolumere VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            verifybucodeuser VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            scorestatus VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            Lottery_prize TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            wheel_luck VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            wheel_luck_price VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            btn_status_extned VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            daywarn VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            categoryhelp VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            linkappstatus VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            iplogin VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            wheelagent VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            Lotteryagent VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            languageen VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            languageru VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statusfirstwheel VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            statuslimitchangeloc VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            Debtsettlement VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            Dice VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            keyboardmain TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            statusnoteforf VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            statuscopycart VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            timeauto_not_verify VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            status_keyboard_config VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            cron_status TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+            limitnumber VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            PRIMARY KEY (id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        $stmt->execute();
+
+        $stmt = $pdo->prepare("INSERT INTO `$tableName` (
+            Bot_Status, roll_Status, get_number, iran_number, NotUser, Channel_Report, limit_usertest_all, 
+            affiliatesstatus, affiliatespercentage, removedayc, showcard, numbercount, statusnewuser, 
+            statusagentrequest, statuscategory, statusterffh, volumewarn, inlinebtnmain, verifystart, 
+            id_support, statusnamecustom, statuscategorygenral, statussupportpv, agentreqprice, bulkbuy, 
+            on_hold_day, cronvolumere, verifybucodeuser, scorestatus, Lottery_prize, wheel_luck, 
+            wheel_luck_price, btn_status_extned, daywarn, categoryhelp, linkappstatus, iplogin, 
+            wheelagent, Lotteryagent, languageen, languageru, statusfirstwheel, statuslimitchangeloc, 
+            Debtsettlement, Dice, keyboardmain, statusnoteforf, statuscopycart, timeauto_not_verify, 
+            status_keyboard_config, cron_status, limitnumber
+        ) VALUES (
+            :Bot_Status, :roll_Status, :get_number, :iran_number, :NotUser, :Channel_Report, :limit_usertest_all, 
+            :affiliatesstatus, :affiliatespercentage, :removedayc, :showcard, :numbercount, :statusnewuser, 
+            :statusagentrequest, :statuscategory, :statusterffh, :volumewarn, :inlinebtnmain, :verifystart, 
+            :id_support, :statusnamecustom, :statuscategorygenral, :statussupportpv, :agentreqprice, :bulkbuy, 
+            :on_hold_day, :cronvolumere, :verifybucodeuser, :scorestatus, :Lottery_prize, :wheel_luck, 
+            :wheel_luck_price, :btn_status_extned, :daywarn, :categoryhelp, :linkappstatus, :iplogin, 
+            :wheelagent, :Lotteryagent, :languageen, :languageru, :statusfirstwheel, :statuslimitchangeloc, 
+            :Debtsettlement, :Dice, :keyboardmain, :statusnoteforf, :statuscopycart, :timeauto_not_verify, 
+            :status_keyboard_config, :cron_status, :limitnumber
+        )");
+        $stmt->execute([
+            ':Bot_Status' => 'botstatuson',
+            ':roll_Status' => 'rolleon',
+            ':get_number' => 'offAuthenticationphone',
+            ':iran_number' => 'offAuthenticationiran',
+            ':NotUser' => 'offnotuser',
+            ':Channel_Report' => null,
+            ':limit_usertest_all' => '1',
+            ':affiliatesstatus' => 'offaffiliates',
+            ':affiliatespercentage' => '0',
+            ':removedayc' => '0',
+            ':showcard' => '1',
+            ':numbercount' => '0',
+            ':statusnewuser' => 'onnewuser',
+            ':statusagentrequest' => 'onrequestagent',
+            ':statuscategory' => 'offcategory',
+            ':statusterffh' => null,
+            ':volumewarn' => '2',
+            ':inlinebtnmain' => 'offinline',
+            ':verifystart' => 'offverify',
+            ':id_support' => '0',
+            ':statusnamecustom' => 'offnamecustom',
+            ':statuscategorygenral' => 'offcategorys',
+            ':statussupportpv' => 'offpvsupport',
+            ':agentreqprice' => '0',
+            ':bulkbuy' => 'onbulk',
+            ':on_hold_day' => '4',
+            ':cronvolumere' => '5',
+            ':verifybucodeuser' => 'offverify',
+            ':scorestatus' => '0',
+            ':Lottery_prize' => $DATAAWARD,
+            ':wheel_luck' => '0',
+            ':wheel_luck_price' => '0',
+            ':btn_status_extned' => null,
+            ':daywarn' => '2',
+            ':categoryhelp' => '0',
+            ':linkappstatus' => '0',
+            ':iplogin' => '0',
+            ':wheelagent' => '1',
+            ':Lotteryagent' => '1',
+            ':languageen' => '0',
+            ':languageru' => '0',
+            ':statusfirstwheel' => '0',
+            ':statuslimitchangeloc' => '0',
+            ':Debtsettlement' => '1',
+            ':Dice' => '0',
+            ':keyboardmain' => $keyboardmain,
+            ':statusnoteforf' => '1',
+            ':statuscopycart' => '0',
+            ':timeauto_not_verify' => '4',
+            ':status_keyboard_config' => '1',
+            ':cron_status' => $status_cron,
+            ':limitnumber' => $limitlist
+        ]);
+        echo "Table $tableName created and data inserted successfully.\n";
+    } else {
+        // Add missing columns
+        addFieldToTable($tableName, 'Bot_Status', 'botstatuson', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'roll_Status', 'rolleon', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'get_number', 'offAuthenticationphone', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'iran_number', 'offAuthenticationiran', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'NotUser', 'offnotuser', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Channel_Report', null, 'VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'limit_usertest_all', '1', 'VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'affiliatesstatus', 'offaffiliates', 'VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'affiliatespercentage', '0', 'VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'removedayc', '0', 'VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'showcard', '1', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'numbercount', '0', 'VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statusnewuser', 'onnewuser', 'VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statusagentrequest', 'onrequestagent', 'VARCHAR(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statuscategory', 'offcategory', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statusterffh', null, 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'volumewarn', '2', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'inlinebtnmain', 'offinline', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'verifystart', 'offverify', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'id_support', '0', 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statusnamecustom', 'offnamecustom', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statuscategorygenral', 'offcategorys', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statussupportpv', 'offpvsupport', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'agentreqprice', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'bulkbuy', 'onbulk', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'on_hold_day', '4', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'cronvolumere', '5', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'verifybucodeuser', 'offverify', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'scorestatus', '0', 'VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Lottery_prize', $DATAAWARD, 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'wheel_luck', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'wheel_luck_price', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'btn_status_extned', null, 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'daywarn', '2', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'categoryhelp', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'linkappstatus', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'iplogin', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'wheelagent', '1', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Lotteryagent', '1', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'languageen', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'languageru', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statusfirstwheel', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statuslimitchangeloc', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Debtsettlement', '1', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'Dice', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'keyboardmain', $keyboardmain, 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statusnoteforf', '1', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'statuscopycart', '0', 'VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'timeauto_not_verify', '4', 'VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'status_keyboard_config', '1', 'VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'cron_status', $status_cron, 'TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        addFieldToTable($tableName, 'limitnumber', $limitlist, 'VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        echo "Table $tableName already exists, checked and updated columns.\n";
+    }
+} catch (Exception $e) {
+    $errorMessage = "Error creating table $tableName: " . $e->getMessage();
+    file_put_contents('error_log_setting', $errorMessage, FILE_APPEND);
+    echo $errorMessage . "\n";
 }
 
 //-----------------------------------------------------------------
@@ -107,147 +401,7 @@ try {
     file_put_contents('error_log', $e->getMessage());
 }
 //-----------------------------------------------------------------
-try {
 
-    $tableName = 'setting';
-    $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_name = :tableName");
-    $stmt->bindParam(':tableName', $tableName);
-    $stmt->execute();
-    $DATAAWARD = json_encode(array(
-        'one' => "0",
-        "tow" => "0",
-        "theree" => "0"
-    ));
-    $limitlist = json_encode(array(
-        'free' => 100,
-        'all' => 100,
-    ));
-    $status_cron = json_encode(array(
-        'day' => true,
-        'volume' => true,
-        'remove' => false,
-        'remove_volume' => false,
-        'test' => false,
-        'on_hold' => false,
-        'uptime_node' => false,
-        'uptime_panel' => false,
-    ));
-    $keyboardmain = '{"keyboard":[[{"text":"text_sell"},{"text":"text_extend"}],[{"text":"text_usertest"},{"text":"text_wheel_luck"}],[{"text":"text_Purchased_services"},{"text":"accountwallet"}],[{"text":"text_affiliates"},{"text":"text_Tariff_list"}],[{"text":"text_support"},{"text":"text_help"}]]}';
-    $tableExists = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$tableExists) {
-        $stmt = $pdo->prepare("CREATE TABLE $tableName (
-        Bot_Status varchar(200)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NULL,
-        roll_Status varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NULL,
-        get_number varchar(200)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NULL,
-        iran_number varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NULL,
-        NotUser varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NULL,
-        Channel_Report varchar(600)  NULL,
-        limit_usertest_all varchar(600)  NULL,
-        affiliatesstatus varchar(600)  NULL,
-        affiliatespercentage varchar(600)  NULL,
-        removedayc varchar(600)  NULL,
-        showcard varchar(200)  NULL,
-        numbercount varchar(600)  NULL,
-        statusnewuser varchar(600)  NULL,
-        statusagentrequest varchar(600)  NULL,
-        statuscategory varchar(200)  NULL,
-        statusterffh varchar(200)  NULL,
-        volumewarn varchar(200)  NULL,
-        inlinebtnmain varchar(200)  NULL,
-        verifystart varchar(200)  NULL,
-        id_support varchar(200)  NULL,
-        statusnamecustom varchar(100)  NULL,
-        statuscategorygenral varchar(100)  NULL,
-        statussupportpv varchar(100)  NULL,
-        agentreqprice varchar(100)  NULL,
-        bulkbuy varchar(100)  NULL,
-        on_hold_day varchar(100)  NULL,
-        cronvolumere varchar(100)  NULL,
-        verifybucodeuser varchar(100)  NULL,
-        scorestatus varchar(100)  NULL,
-        Lottery_prize TEXT  NULL,
-        wheelـluck varchar(45)  NULL,
-        wheelـluck_price varchar(45)  NULL,
-        btn_status_extned varchar(45)  NULL,
-        daywarn varchar(45)  NULL,
-        categoryhelp varchar(45)  NULL,
-        linkappstatus varchar(45)  NULL,
-        iplogin varchar(45)  NULL,
-        wheelagent varchar(45)  NULL,
-        Lotteryagent varchar(45)  NULL,
-        languageen varchar(45)  NULL,
-        languageru varchar(45)  NULL,
-        statusfirstwheel varchar(45)  NULL,
-        statuslimitchangeloc varchar(45)  NULL,
-        Debtsettlement varchar(45)  NULL,
-        Dice varchar(45) NULL,
-        keyboardmain TEXT NOT NULL,
-        statusnoteforf varchar(45) NOT NULL,
-        statuscopycart varchar(45) NOT NULL,
-        timeauto_not_verify varchar(20) NOT NULL,
-        status_keyboard_config varchar(20)  NULL,
-        cron_status TEXT NOT NULL,
-        limitnumber varchar(200)  NULL)
-        ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci");
-        $stmt->execute();
-        $stmt = $pdo->prepare("INSERT INTO setting (Bot_Status,roll_Status,get_number,limit_usertest_all,iran_number,NotUser,affiliatesstatus,affiliatespercentage,removedayc,showcard,statuscategory,numbercount,statusnewuser,statusagentrequest,volumewarn,inlinebtnmain,verifystart,statussupportpv,statusnamecustom,statuscategorygenral,agentreqprice,cronvolumere,bulkbuy,on_hold_day,verifybucodeuser,scorestatus,Lottery_prize,wheelـluck,wheelـluck_price,iplogin,daywarn,categoryhelp,linkappstatus,languageen,languageru,wheelagent,Lotteryagent,statusfirstwheel,statuslimitchangeloc,limitnumber,Debtsettlement,Dice,keyboardmain,statusnoteforf,statuscopycart,timeauto_not_verify,status_keyboard_config,cron_status) VALUES ('botstatuson','rolleon','offAuthenticationphone','1','offAuthenticationiran','offnotuser','offaffiliates','0','0','1','offcategory','0','onnewuser','onrequestagent','2','offinline','offverify','offpvsupport','offnamecustom','offcategorys','0','5','onbulk','4','offverify','0','$DATAAWARD','0','0','0','2','0','0','0','0','1','1','0','0','$limitlist','1','0','$keyboardmain','1','0','4','1','$status_cron')");
-        $stmt->execute();
-    } else {
-        addFieldToTable("setting", "cron_status", $status_cron, "TEXT");
-        addFieldToTable("setting", "status_keyboard_config", "1", "varchar(20)");
-        addFieldToTable("setting", "statusnoteforf", "1", "varchar(20)");
-        addFieldToTable("setting", "timeauto_not_verify", "4", "varchar(20)");
-        addFieldToTable("setting", "statuscopycart", "0", "varchar(20)");
-        addFieldToTable("setting", "keyboardmain", $keyboardmain, "TEXT");
-        addFieldToTable("setting", "Dice", '0', "varchar(45)");
-        addFieldToTable("setting", "Debtsettlement", '1', "varchar(45)");
-        addFieldToTable("setting", "limitnumber", $limitlist, "varchar(200)");
-        addFieldToTable("setting", "statuslimitchangeloc", "0", "varchar(45)");
-        addFieldToTable("setting", "statusfirstwheel", "0", "varchar(45)");
-        addFieldToTable("setting", "Lotteryagent", "1", "varchar(45)");
-        addFieldToTable("setting", "wheelagent", "1", "varchar(45)");
-        addFieldToTable("setting", "languageru", "0", "varchar(45)");
-        addFieldToTable("setting", "languageen", "0", "varchar(45)");
-        addFieldToTable("setting", "linkappstatus", "0", "varchar(45)");
-        addFieldToTable("setting", "categoryhelp", "0", "varchar(45)");
-        addFieldToTable("setting", "daywarn", "2", "varchar(45)");
-        addFieldToTable("setting", "btn_status_extned", "0", "varchar(45)");
-        addFieldToTable("setting", "iplogin", "0", "varchar(45)");
-        addFieldToTable("setting", "wheelـluck_price", "0", "varchar(45)");
-        addFieldToTable("setting", "wheelـluck", "0", "varchar(45)");
-        addFieldToTable("setting", "Lottery_prize", $DATAAWARD, "TEXT");
-        addFieldToTable("setting", "scorestatus", "0", "VARCHAR(100)");
-        addFieldToTable("setting", "verifybucodeuser", "offverify", "VARCHAR(100)");
-        addFieldToTable("setting", "on_hold_day", "4", "VARCHAR(100)");
-        addFieldToTable("setting", "bulkbuy", "onbulk", "VARCHAR(100)");
-        addFieldToTable("setting", "statuscategorygenral", "offcategorys", "VARCHAR(100)");
-        addFieldToTable("setting", "cronvolumere", "5", "VARCHAR(100)");
-        addFieldToTable("setting", "agentreqprice", "0", "VARCHAR(100)");
-        addFieldToTable("setting", "statusnamecustom", "offnamecustom", "VARCHAR(100)");
-        addFieldToTable("setting", "id_support", "0", "VARCHAR(100)");
-        addFieldToTable("setting", "statussupportpv", "offpvsupport", "VARCHAR(100)");
-        addFieldToTable("setting", "affiliatespercentage", "0", "VARCHAR(600)");
-        addFieldToTable("setting", "inlinebtnmain", "offinline", "VARCHAR(200)");
-        addFieldToTable("setting", "volumewarn", "2", "VARCHAR(200)");
-        addFieldToTable("setting", "statusagentrequest", "onrequestagent", "VARCHAR(600)");
-        addFieldToTable("setting", "statusnewuser", "onnewuser", "VARCHAR(600)");
-        addFieldToTable("setting", "numbercount", "0", "VARCHAR(600)");
-        addFieldToTable("setting", "statuscategory", "offcategory", "VARCHAR(600)");
-        addFieldToTable("setting", "showcard", "1", "VARCHAR(200)");
-        addFieldToTable("setting", "removedayc", "1", "VARCHAR(200)");
-        addFieldToTable("setting", "affiliatesstatus", "offaffiliates", "VARCHAR(600)");
-        addFieldToTable("setting", "NotUser", "offnotuser", "VARCHAR(200)");
-        addFieldToTable("setting", "iran_number", "offAuthenticationiran", "VARCHAR(200)");
-        addFieldToTable("setting", "get_number", "onAuthenticationphone", "VARCHAR(200)");
-        addFieldToTable("setting", "limit_usertest_all", "1", "VARCHAR(200)");
-        addFieldToTable("setting", "Channel_Report", "0", "VARCHAR(200)");
-        addFieldToTable("setting", "Bot_Status", "botstatuson", "VARCHAR(200)");
-        addFieldToTable("setting", "roll_Status", "rolleon", "VARCHAR(200)");
-        addFieldToTable("setting", "verifystart", "offverify", "VARCHAR(200)");
-    }
-} catch (Exception $e) {
-    file_put_contents('error_log', $e->getMessage());
-}
 
 //-----------------------------------------------------------------
 try {
