@@ -420,13 +420,13 @@ function install_bot() {
     fi
 
     # Default to latest release
-    ZIP_URL=$(curl -s https://api.github.com/repos/mahdiMGF2/botmirzapanel/releases/latest | grep "zipball_url" | cut -d '"' -f 4)
+    ZIP_URL=$(curl -s https://api.github.com/repos/Mmdd93/mirza_pro/releases/latest | grep "zipball_url" | cut -d '"' -f 4)
 
 # Check for version flag
 if [[ "$1" == "-v" && "$2" == "beta" ]] || [[ "$1" == "-beta" ]] || [[ "$1" == "-" && "$2" == "beta" ]]; then
-    ZIP_URL="https://github.com/mahdiMGF2/botmirzapanel/archive/refs/heads/main.zip"
+    ZIP_URL="https://github.com/Mmdd93/mirza_pro/archive/refs/heads/main.zip"
 elif [[ "$1" == "-v" && -n "$2" ]]; then
-    ZIP_URL="https://github.com/mahdiMGF2/botmirzapanel/archive/refs/tags/$2.zip"
+    ZIP_URL="https://github.com/Mmdd93/mirza_pro/archive/refs/tags/$2.zip"
 fi
 
     # Download and extract the repository
