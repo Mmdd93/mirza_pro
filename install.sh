@@ -1137,8 +1137,8 @@ EOF
     
 
     # Add executable permission and link
-    chmod +x /root/install.sh
-    ln -vs /root/install.sh /usr/local/bin/mirza
+    chmod +x /root/mirza.sh
+    ln -vs /root/mirza.sh /usr/local/bin/mirza
 }
 
 
@@ -1256,8 +1256,8 @@ function install_bot_with_marzban() {
     fi
 
     # Install PHP 8.2 and all necessary modules (including PDO)
-    DEBIAN_FRONTEND=noninteractive sudo apt install -y php8.2 php8.2-fpm php8.2-mysql php8.2-mbstring php8.2-zip php8.2-gd php8.2-curchmod +x /root/install.sh
-    ln -vs /root/install.sh /usr/local/bin/mirza
+    DEBIAN_FRONTEND=noninteractive sudo apt install -y php8.2 php8.2-fpm php8.2-mysql php8.2-mbstring php8.2-zip php8.2-gd php8.2-curchmod +x /root/mirza.sh
+    ln -vs /root/mirza.sh /usr/local/bin/mirza
 l php8.2-soap php8.2-ssh2 libssh2-1-dev libssh2-1 php8.2-pdo || {
         echo -e "\e[91mError: Failed to install PHP 8.2 and modules.\033[0m"
         exit 1
@@ -1654,8 +1654,8 @@ EOF
     echo -e "\e[33mBot folder: \e[36m$bot_folder_name\033[0m"
 
     # Add executable permission and link
-    chmod +x /root/install.sh
-    ln -vs /root/install.sh /usr/local/bin/mirza
+    chmod +x /root/mirza.sh
+    ln -vs /root/mirza.sh /usr/local/bin/mirza
 }
 # Update Function
 # Update Function
@@ -1774,12 +1774,12 @@ function update_bot() {
     sudo chmod -R 755 "$BOT_DIR/"
     sudo chmod 644 "$CONFIG_PATH" 2>/dev/null
 
-    # Copy the new install.sh to /root/ if updating mirzabotconfig
-    if [ "$SELECTED_BOT" = "mirzabotconfig" ] && [ -f "/var/www/html/mirzabotconfig/install.sh" ]; then
-        sudo cp /var/www/html/$BOT_DIR/install.sh /root/install.sh
-        sudo chmod +x /root/install.sh
-        sudo ln -vsf /root/install.sh /usr/local/bin/mirza
-        echo -e "\033[92mUpdated /root/install.sh and 'mirza' command.\033[0m"
+    # Copy the new mirza.sh to /root/ if updating mirzabotconfig
+    if [ "$SELECTED_BOT" = "mirzabotconfig" ] && [ -f "/var/www/html/mirzabotconfig/mirza.sh" ]; then
+        sudo cp /var/www/html/$BOT_DIR/mirza.sh /root/mirza.sh
+        sudo chmod +x /root/mirza.sh
+        sudo ln -vsf /root/mirza.sh /usr/local/bin/mirza
+        echo -e "\033[92mUpdated /root/mirza.sh and 'mirza' command.\033[0m"
     fi
 
    
