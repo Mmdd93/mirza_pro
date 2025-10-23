@@ -419,15 +419,11 @@ function install_bot() {
         exit 1
     fi
 
-    # Default to latest release
-    ZIP_URL=$(curl -s https://api.github.com/repos/Mmdd93/mirza_pro/releases/latest | grep "zipball_url" | cut -d '"' -f 4)
+   
 
 # Check for version flag
-if [[ "$1" == "-v" && "$2" == "beta" ]] || [[ "$1" == "-beta" ]] || [[ "$1" == "-" && "$2" == "beta" ]]; then
+
     ZIP_URL="https://github.com/Mmdd93/mirza_pro/archive/refs/heads/main.zip"
-elif [[ "$1" == "-v" && -n "$2" ]]; then
-    ZIP_URL="https://github.com/Mmdd93/mirza_pro/archive/refs/tags/$2.zip"
-fi
 
     # Download and extract the repository
     TEMP_DIR="/tmp/mirzabot"
@@ -1014,12 +1010,10 @@ function install_bot_with_marzban() {
     }
 
     # Download bot files
-    ZIP_URL=$(curl -s https://api.github.com/repos/mahdiMGF2/botmirzapanel/releases/latest | grep "zipball_url" | cut -d '"' -f 4)
-    if [[ "$1" == "-v" && "$2" == "beta" ]] || [[ "$1" == "-beta" ]] || [[ "$1" == "-" && "$2" == "beta" ]]; then
-        ZIP_URL="https://github.com/mahdiMGF2/botmirzapanel/archive/refs/heads/main.zip"
-    elif [[ "$1" == "-v" && -n "$2" ]]; then
-        ZIP_URL="https://github.com/mahdiMGF2/botmirzapanel/archive/refs/tags/$2.zip"
-    fi
+ 
+        ZIP_URL="https://github.com/Mmdd93/mirza_pro/archive/refs/heads/main.zip"
+  
+    
 
     TEMP_DIR="/tmp/mirzabot"
     mkdir -p "$TEMP_DIR"
@@ -1303,12 +1297,8 @@ function update_bot() {
     fi
 
     # Fetch latest release from GitHub
-    # Check for version flag
-    if [[ "$1" == "-beta" ]] || [[ "$1" == "-v" && "$2" == "beta" ]]; then
-        ZIP_URL="https://github.com/mahdiMGF2/botmirzapanel/archive/refs/heads/main.zip"
-    else
-        ZIP_URL=$(curl -s https://api.github.com/repos/mahdiMGF2/botmirzapanel/releases/latest | grep "zipball_url" | cut -d '"' -f4)
-    fi
+        ZIP_URL="https://github.com/Mmdd93/mirza_pro/archive/refs/heads/main.zip"
+
 
     # Create temporary directory
     TEMP_DIR="/tmp/mirzabot_update"
@@ -2080,7 +2070,7 @@ EOF"
     # Clone a Fresh Copy of the Bot's Source Code
     BOT_DIR="/var/www/html/$BOT_NAME"
     echo -e "\033[33mCloning bot's source code...\033[0m"
-    git clone https://github.com/mahdiMGF2/botmirzapanel.git "$BOT_DIR" || {
+    git clone https://github.com/Mmdd93/mirza_pro.git "$BOT_DIR" || {
         echo -e "\033[31mError: Failed to clone the repository.\033[0m"
         return 1
     }
@@ -2247,7 +2237,7 @@ function update_additional_bot() {
     fi
 
     # Clone the new version of the bot
-    if ! git clone https://github.com/mahdiMGF2/botmirzapanel.git "$BOT_PATH"; then
+    if ! git clone https://github.com/Mmdd93/mirza_pro.git "$BOT_PATH"; then
         echo -e "\033[31mFailed to clone the repository. Exiting...\033[0m"
         return 1
     fi
