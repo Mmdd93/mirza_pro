@@ -75,9 +75,11 @@ read_mirza_configs() {
         domain=$(grep "domainhosts" "$config_file" | head -1 | cut -d= -f2 | sed "s/[';]//g" | sed 's/\"//g' | xargs)
         dbname=$(grep "dbname" "$config_file" | head -1 | cut -d= -f2 | sed "s/[';]//g" | sed 's/\"//g' | xargs)
         usernamedb=$(grep "usernamedb" "$config_file" | head -1 | cut -d= -f2 | sed "s/[';]//g" | sed 's/\"//g' | xargs)
+        passworddb=$(grep "passworddb" "$config_file" | head -1 | cut -d= -f2 | sed "s/[';]//g" | sed 's/\"//g' | xargs)
         usernamebot=$(grep "usernamebot" "$config_file" | head -1 | cut -d= -f2 | sed "s/[';]//g" | sed 's/\"//g' | xargs)
         apikey=$(grep "APIKEY" "$config_file" | head -1 | cut -d= -f2 | sed "s/[';]//g" | sed 's/\"//g' | xargs)
         adminnumber=$(grep "adminnumber" "$config_file" | head -1 | cut -d= -f2 | sed "s/[';]//g" | sed 's/\"//g' | xargs)
+        secrettoken=$(grep "secrettoken" "$config_file" | head -1 | cut -d= -f2 | sed "s/[';]//g" | sed 's/\"//g' | xargs 2>/dev/null)
 
         # Get SSL expiry information
         ssl_info=$(check_ssl_expiry "$domain")
@@ -87,9 +89,18 @@ read_mirza_configs() {
         echo -e "\033[36mSSL Status:\033[0m    $ssl_info"
         echo -e "\033[36mDatabase:\033[0m      ${dbname:-\033[31mNot set\033[0m}"
         echo -e "\033[36mDB User:\033[0m       ${usernamedb:-\033[31mNot set\033[0m}"
+        echo -e "\033[36mDB Password:\033[0m   ${passworddb:-\033[31mNot set\033[0m}"
         echo -e "\033[36mBot Username:\033[0m  ${usernamebot:-\033[31mNot set\033[0m}"
         echo -e "\033[36mAPI Key:\033[0m       ${apikey:-\033[31mNot set\033[0m}"
         echo -e "\033[36mAdmin Number:\033[0m  ${adminnumber:-\033[31mNot set\033[0m}"
+        
+        # Show secret token if exists
+        if [ -n "$secrettoken" ]; then
+            echo -e "\033[36mSecret Token:\033[0m   ${secrettoken:-\033[31mNot set\033[0m}"
+        fi
+        
+        # Show config file path
+        echo -e "\033[90mConfig File:\033[0m   $config_file"
     done
 
     echo -e "\n\033[1;32m[SUCCESS] Scan complete.\033[0m"
