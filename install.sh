@@ -163,7 +163,7 @@ show_menu() {
         echo -e "\033[1;36mMirza Bot Management Menu\033[0m"
         echo -e "\033[1;36m=================================================\033[0m"
         echo -e "\033[1;36m1.\033[0m Install Mirza (full setup)"
-        echo -e "\033[1;36m2.\033[0m Install Additional Bot"
+        echo -e "\033[1;36m2.\033[0m Add Additional Bot"
         echo -e "\033[1;36m3.\033[0m Update Bots"
         echo -e "\033[1;36m4.\033[0m Uninstall Mirza"
         echo -e "\033[1;36m5.\033[0m Remove Additional Bot"
