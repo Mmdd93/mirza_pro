@@ -375,6 +375,8 @@ function install_bot() {
         install_bot_with_marzban "$@"  # Pass any arguments (e.g., -v beta)
         return 0
     fi
+	sudo apt update
+    sudo apt install -y software-properties-common
 
     # Function to add the Ondrej Surý PPA for PHP
     add_php_ppa() {
